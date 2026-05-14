@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Minha Saúde Feminina",
+    "slug": "minha-saude-feminina",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.minhasaudefeminina.app"
+    },
+    "android": {
+      "package": "com.minhasaudefeminina.app",
+      "minSdkVersion": 21
+    },
+    "extra": {
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
+    },
+    "plugins": [
+      "expo-font",
+      "expo-asset"
+    ]
+  }
+}
