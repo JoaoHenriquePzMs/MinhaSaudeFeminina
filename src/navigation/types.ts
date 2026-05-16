@@ -1,13 +1,14 @@
 export type RootStackParamList = {
+  // Auth flow
+  Login: undefined;
+  Register: undefined;
+  // Main app
   Main: undefined;
   QuickRegisterModal: undefined;
   ArticleDetail: { articleId: string };
   Notifications: undefined;
   DayDetail: undefined;
   Sintomas: undefined;
-  Ciclo: undefined;
-  Prevencao: undefined;
-  BemEstar: undefined;
 };
 
 export type TabParamList = {

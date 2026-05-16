@@ -8,14 +8,15 @@
 
 export const Colors = {
   // Primary palette
-  primary: '#7C3AED',
-  primaryLight: '#A78BFA',
-  primaryDark: '#5B21B6',
+  primary: '#C43A4A',
+  primaryLight: '#C56682',
+  primaryDark: '#9E2E3B',
 
   // Surfaces
-  background: '#F8F7FF',
+  background: '#FBF4EB',
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
+  surfacePink: '#FBD9E5',
 
   // Text
   textPrimary: '#1A1A2E',
@@ -35,8 +36,11 @@ export const Colors = {
   overlay: 'rgba(0, 0, 0, 0.5)',
 
   // Cycle Banner gradient
-  gradientStart: '#7C3AED',
-  gradientEnd: '#A855F7',
+  gradientStart: '#C43A4A',
+  gradientEnd: '#C56682',
+
+  // Accent
+  accent: '#E7A48C',
 } as const;
 
 export type ColorKey = keyof typeof Colors;

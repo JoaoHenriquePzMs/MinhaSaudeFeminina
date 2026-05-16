@@ -7,6 +7,27 @@ export type CyclePhase =
   | 'FASE OVULATÓRIA'
   | 'FASE LÚTEA';
 
+// Artigo de saúde para a tela de Conteúdos
+export interface HealthArticle {
+  id: string;
+  category: string;
+  categoryKey: string;
+  title: string;
+  description: string;
+  icon: string;
+  content: {
+    intro?: string;
+    whatIsNormal?: string[];
+    whatIsNotNormal?: string[];
+    whenToSeekHelp?: string[];
+    whatToDoAtHome?: string[];
+    warning?: string;
+  };
+}
+
+// Dia do calendário do ciclo
+export type CalendarDayType = 'menstruation' | 'fertile' | 'ovulation' | 'luteal' | 'follicular' | 'today' | 'default';
+
 // Requisito: 1.2 — Dados do ciclo menstrual da usuária
 export interface CycleData {
   day: number;         // 1–35

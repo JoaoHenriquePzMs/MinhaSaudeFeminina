@@ -11,7 +11,9 @@
     },
     "android": {
       "package": "com.minhasaudefeminina.app",
-      "minSdkVersion": 21
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF"
+      }
     },
     "extra": {
       "eas": {
@@ -19,8 +21,8 @@
       }
     },
     "plugins": [
-      "expo-font",
-      "expo-asset"
+      "expo-asset",
+      "expo-font"
     ]
   }
 }
