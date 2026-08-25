@@ -9,6 +9,7 @@ export type RootStackParamList = {
   Notifications: undefined;
   DayDetail: undefined;
   Sintomas: undefined;
+  History: undefined;
 };
 
 export type TabParamList = {
