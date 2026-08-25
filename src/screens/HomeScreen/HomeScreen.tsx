@@ -184,7 +184,7 @@ type StackNav = NativeStackNavigationProp<RootStackParamList>;
 
 const HomeScreen: React.FC = () => {
   // ── Data hooks ────────────────────────────────────────────────────────
-  const { cycleData } = useCycleData();
+  const { cycleDay, phase } = useCycleData();
   const { summaryData } = useTodaySummary();
   const { contentData, isLoading, hasError, retry } = useHealthContent();
 
@@ -252,8 +252,8 @@ const HomeScreen: React.FC = () => {
       >
         <View style={styles.section}>
           <CycleBanner
-            cycleDay={cycleData?.day}
-            phase={cycleData?.phase}
+            cycleDay={cycleDay ?? undefined}
+            phase={phase}
             onConfigurePress={handleConfigureCycle}
           />
         </View>

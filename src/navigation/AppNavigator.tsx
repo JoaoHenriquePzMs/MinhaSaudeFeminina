@@ -18,6 +18,7 @@ import TabNavigator from './TabNavigator';
 import { LoginScreen, RegisterScreen } from '../screens/AuthScreen';
 import QuickRegisterModal from '../screens/QuickRegisterModal';
 import SintomasScreen from '../screens/SintomasScreen';
+import HistoryScreen from '../screens/HistoryScreen';
 
 // ─── Placeholder modal ────────────────────────────────────────────────────────
 
@@ -77,6 +78,12 @@ const AppNavigator: React.FC = () => {
         <Stack.Screen
           name="Sintomas"
           component={SintomasScreen}
+          options={{ presentation: 'modal' }}
+        />
+
+        <Stack.Screen
+          name="History"
+          component={HistoryScreen}
           options={{ presentation: 'modal' }}
         />
       </Stack.Navigator>
