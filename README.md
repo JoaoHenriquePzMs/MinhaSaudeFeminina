@@ -76,45 +76,69 @@ O desenvolvimento seguirá uma esteira ágil, contemplando as seguintes fases:
 ## Como Executar o Projeto Localmente
 
 ### Pré-requisitos
-* Node.js e gerenciador de pacotes (npm ou yarn)
-* SDK do .NET (ex: .NET 8)
-* PostgreSQL instalado e rodando
-* Emulador Android/iOS ou dispositivo físico (para o React Native)
+* Node.js (v18+)
+* Gerenciador de pacotes: `npm` (mobile) e `pnpm` (sistema de artigos)
+* MySQL / TiDB ou PostgreSQL para persistência
+* Emulador Android/iOS ou aplicativo Expo Go no celular
 
-### 1. Configurando o Banco de Dados (PostgreSQL)
-1. Crie um banco de dados no PostgreSQL.
-2. No repositório do back-end, localize o arquivo `appsettings.json`.
-3. Atualize a string de conexão (`ConnectionStrings`) com as credenciais do seu banco local.
-4. Execute as migrations para criar as tabelas no banco:
+---
+
+### 1. Rodando o App Mobile (React Native / Expo)
+
+1. Na raiz do projeto, instale as dependências:
    ```bash
-   dotnet ef database update
+   npm install
+   ```
 
-### 2. Rodando a API (C# .NET)
-1. Acesse a pasta do back-end:
-    ```Bash
-    cd backend
+2. Inicie o servidor de desenvolvimento do Expo:
+   ```bash
+   npx expo start
+   ```
 
-2. Restaure as dependências e inicie o servidor:
-    ```Bash
-    dotnet run
+3. Abra no emulador (pressione `a` para Android ou `i` para iOS) ou escaneie o QR Code com o aplicativo Expo Go.
 
-A API estará disponível localmente (geralmente em http://localhost:5000 ou https://localhost:5001).
+---
 
-### 3. Rodando o App (React Native)
+### 2. Rodando o Sistema de Artigos (API independente + Painel Web)
 
-1. Acesse a pasta do mobile:
-    ```Bash
-    cd mobile
+O sistema de gestão e persistência de artigos fica na pasta `sistema-artigos/`.
 
-2. Instale as dependências:
-    ```Bash
-    npm install
+1. Acesse o diretório do sistema de artigos:
+   ```bash
+   cd sistema-artigos
+   ```
 
-3. Inicie o empacotador:
-    ```Bash
-    npx expo start
+2. Instale as dependências com `pnpm`:
+   ```bash
+   pnpm install
+   pnpm --dir api install
+   ```
 
-(Substitua por npx react-native start se estiver utilizando a CLI pura do React Native).
+3. Configure o arquivo `.env` da API (`sistema-artigos/api/.env`) com a URL do banco de dados:
+   ```env
+   DATABASE_URL=mysql://usuario:senha@host:3306/banco
+   API_PORT=4001
+   ARTICLE_SEARCH_API_KEY=uma-chave-interna-forte
+   ```
+
+4. Aplique as migrações no banco:
+   ```bash
+   pnpm --dir api db:migrate
+   ```
+
+5. Em terminais separados:
+   - **Terminal 1 (API Independente):**
+     ```bash
+     pnpm api:dev
+     ```
+   - **Terminal 2 (Servidor Público / Painel Web):**
+     ```bash
+     pnpm dev
+     ```
+
+* A API estará disponível em `http://localhost:4001`
+* O painel web de artigos estará disponível em `http://localhost:3000`
+* Para mais detalhes sobre rotas e contratos, consulte o [README do Sistema de Artigos](file:///c:/Users/Nathan/.gemini/antigravity-ide/scratch/MinhaSaudeFeminina/sistema-artigos/README.md).
 
 ## Equipe
 ### Sistemas de Informação (UNIFEBE)
