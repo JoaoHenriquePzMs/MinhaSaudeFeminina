@@ -9,7 +9,8 @@
  *  - Modal de detalhe com conteúdo completo
  */
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   Animated,
   Modal,
@@ -19,26 +20,38 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import RenderHtml from 'react-native-render-html';
 import Header from '../../components/Header';
 import MenuDrawer from '../../components/common/MenuDrawer';
 import { Colors, Spacing, Typography, BorderRadius } from '../../theme';
 import { styles } from './ContentsScreen.styles';
-import { HEALTH_ARTICLES, ARTICLE_CATEGORIES } from '../../data/mockData';
-import { HealthArticle } from '../../data/types';
+import { ARTICLE_CATEGORIES } from '../../data/mockData';
+
+export interface ApiArticle {
+  id: string;
+  category: string;
+  categoryKey: string;
+  title: string;
+  description: string;
+  icon: string;
+  content: string;
+}
 
 // ─── Article Detail Modal ─────────────────────────────────────────────────────
 
 interface ArticleDetailProps {
-  article: HealthArticle;
+  article: ApiArticle;
   onClose: () => void;
 }
 
 const ArticleDetail: React.FC<ArticleDetailProps> = ({ article, onClose }) => {
-  const { content } = article;
+  const { width } = useWindowDimensions();
 
   return (
     <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
@@ -73,78 +86,23 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ article, onClose }) => {
           <Text style={styles.modalDescription}>{article.description}</Text>
         </View>
 
-        {content.intro ? (
-          <View style={styles.modalSection}>
-            <Text style={styles.modalBodyText}>{content.intro}</Text>
-          </View>
-        ) : null}
-
-        {content.whatIsNormal && content.whatIsNormal.length > 0 ? (
-          <View style={styles.modalSection}>
-            <View style={styles.modalSectionHeader}>
-              <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
-              <Text style={styles.modalSectionTitle}>O que é normal</Text>
-            </View>
-            {content.whatIsNormal.map((item, i) => (
-              <View key={i} style={styles.modalBulletRow}>
-                <View style={[styles.modalBulletDot, { backgroundColor: Colors.success }]} />
-                <Text style={styles.modalBulletText}>{item}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
-
-        {content.whatIsNotNormal && content.whatIsNotNormal.length > 0 ? (
-          <View style={styles.modalSection}>
-            <View style={styles.modalSectionHeader}>
-              <Ionicons name="alert-circle" size={20} color={Colors.warning} />
-              <Text style={styles.modalSectionTitle}>Fique atenta</Text>
-            </View>
-            {content.whatIsNotNormal.map((item, i) => (
-              <View key={i} style={styles.modalBulletRow}>
-                <View style={[styles.modalBulletDot, { backgroundColor: Colors.warning }]} />
-                <Text style={styles.modalBulletText}>{item}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
-
-        {content.whenToSeekHelp && content.whenToSeekHelp.length > 0 ? (
-          <View style={styles.modalSection}>
-            <View style={styles.modalSectionHeader}>
-              <Ionicons name="location" size={20} color={Colors.primary} />
-              <Text style={styles.modalSectionTitle}>Quando procurar a UBS</Text>
-            </View>
-            {content.whenToSeekHelp.map((item, i) => (
-              <View key={i} style={styles.modalBulletRow}>
-                <View style={[styles.modalBulletDot, { backgroundColor: Colors.primary }]} />
-                <Text style={styles.modalBulletText}>{item}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
-
-        {content.whatToDoAtHome && content.whatToDoAtHome.length > 0 ? (
-          <View style={styles.modalSection}>
-            <View style={styles.modalSectionHeader}>
-              <Ionicons name="home" size={20} color={Colors.info} />
-              <Text style={styles.modalSectionTitle}>O que você pode fazer em casa</Text>
-            </View>
-            {content.whatToDoAtHome.map((item, i) => (
-              <View key={i} style={styles.modalBulletRow}>
-                <View style={[styles.modalBulletDot, { backgroundColor: Colors.info }]} />
-                <Text style={styles.modalBulletText}>{item}</Text>
-              </View>
-            ))}
-          </View>
-        ) : null}
-
-        {content.warning ? (
-          <View style={styles.modalWarning}>
-            <Ionicons name="warning" size={18} color={Colors.warning} />
-            <Text style={styles.modalWarningText}>{content.warning}</Text>
-          </View>
-        ) : null}
+        <View style={styles.modalSection}>
+          <RenderHtml
+            contentWidth={width - Spacing.base * 2}
+            source={{ html: article.content }}
+            tagsStyles={{
+              p: { fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 12 },
+              h1: { fontSize: 24, color: Colors.textPrimary, fontWeight: 'bold', marginBottom: 16 },
+              h2: { fontSize: 20, color: Colors.textPrimary, fontWeight: 'bold', marginBottom: 12 },
+              h3: { fontSize: 18, color: Colors.textPrimary, fontWeight: 'bold', marginBottom: 12 },
+              img: { borderRadius: 8, marginTop: 12, marginBottom: 12 },
+              strong: { fontWeight: 'bold', color: Colors.textPrimary },
+              li: { fontSize: 16, color: Colors.textSecondary, lineHeight: 24, marginBottom: 8 },
+              ul: { paddingLeft: 20 },
+              ol: { paddingLeft: 20 },
+            }}
+          />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -247,20 +205,62 @@ const HighlightText: React.FC<{
 
 const ContentsScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('Todos');
-  const [selectedArticle, setSelectedArticle] = useState<HealthArticle | null>(null);
+  const [selectedArticle, setSelectedArticle] = useState<ApiArticle | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchVisible, setSearchVisible] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [articles, setArticles] = useState<ApiArticle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const searchAnim = useRef(new Animated.Value(0)).current;
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchArticles();
+    }, [])
+  );
+
+  const fetchArticles = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://192.168.1.30:3000/api/articles/search?q=');
+      if (response.ok) {
+        const data = await response.json();
+        const publishedArticles = (data.articles || []).filter((a: any) => a.status === 'Publicado');
+          const mapped: ApiArticle[] = publishedArticles.map((a: any) => {
+          const cat = a.category || 'Saúde';
+          let icon = 'leaf-outline';
+          if (cat === 'Ciclo') icon = 'water-outline';
+          if (cat === 'Prevenção' || cat === 'Autocuidado') icon = 'shield-checkmark-outline';
+          
+          const cleanExcerpt = a.excerpt || (a.content ? a.content.replace(/<[^>]+>/g, '').substring(0, 100) + '...' : '');
+
+          return {
+            id: a.id || Math.random().toString(),
+            category: cat,
+            categoryKey: cat,
+            title: a.title,
+            description: cleanExcerpt,
+            icon: icon,
+            content: a.content || ''
+          };
+        });
+        setArticles(mapped);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar artigos:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // ── Filter logic ──────────────────────────────────────────────────────
 
   const filteredArticles = useMemo(() => {
-    let list = HEALTH_ARTICLES;
+    let list = articles;
 
     // Category filter
     if (activeCategory !== 'Todos') {
-      list = list.filter(a => a.categoryKey === activeCategory);
+      list = list.filter(a => a.categoryKey === activeCategory || a.category === activeCategory);
     }
 
     // Search filter
@@ -271,12 +271,12 @@ const ContentsScreen: React.FC = () => {
           a.title.toLowerCase().includes(q) ||
           a.description.toLowerCase().includes(q) ||
           a.category.toLowerCase().includes(q) ||
-          (a.content.intro ?? '').toLowerCase().includes(q),
+          a.content.toLowerCase().includes(q),
       );
     }
 
     return list;
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, articles]);
 
   // ── Search toggle ─────────────────────────────────────────────────────
 
@@ -382,8 +382,14 @@ const ContentsScreen: React.FC = () => {
             </Text>
           </View>
 
+          {isLoading && (
+            <View style={{ padding: Spacing.xl, alignItems: 'center' }}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+            </View>
+          )}
+
           {/* Empty state */}
-          {filteredArticles.length === 0 && (
+          {!isLoading && filteredArticles.length === 0 && (
             <View style={emptyStyles.wrap}>
               <Ionicons name="search-outline" size={48} color={Colors.textDisabled} />
               <Text style={emptyStyles.title}>Nenhum resultado</Text>
@@ -393,7 +399,7 @@ const ContentsScreen: React.FC = () => {
             </View>
           )}
 
-          {filteredArticles.map((article) => (
+          {!isLoading && filteredArticles.map((article) => (
             <TouchableOpacity
               key={article.id}
               style={styles.articleCard}
@@ -494,3 +500,5 @@ const emptyStyles = StyleSheet.create({
 });
 
 export default ContentsScreen;
+
+
